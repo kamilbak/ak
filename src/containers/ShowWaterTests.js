@@ -8,6 +8,7 @@ import AreaChartExtended from "../components/AreaChartExtended";
 
 import { mockedTestsData } from "../utils/dataMocks";
 
+
 import { deleteWaterTest } from "../store/actions/waterTests";
 
 import {
@@ -36,8 +37,12 @@ class ShowWaterTests extends Component {
         return a[2] - b[2] || a[1] - b[1] || a[0] - b[0];
       });
     }
+
     // console.log(this.props.testsData);
     // this.props.dispatch(deleteWaterTest(this.props.testsData[0].id));
+
+    console.log(this.props.testsData);
+
 
     return (
       <div>

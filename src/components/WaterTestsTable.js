@@ -2,9 +2,13 @@ import React from "react";
 
 import _ from "lodash";
 
+
 import { Table, Input, Icon } from "semantic-ui-react";
 
 import WaterTestsRow from "./WaterTestsRow";
+
+import { Table, Input } from "semantic-ui-react";
+
 
 class WaterTestsTable extends React.Component {
   state = {
@@ -39,6 +43,7 @@ class WaterTestsTable extends React.Component {
   render() {
     const { column, data, direction } = this.state;
     console.log(">", this.props);
+
     return (
       <div>
         <Table celled selectable sortable>
@@ -64,6 +69,7 @@ class WaterTestsTable extends React.Component {
           </Table.Header>
 
           <Table.Body>
+
             {data &&
               data.map(testData => <WaterTestsRow testData={testData} />)}
           </Table.Body>
