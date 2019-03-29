@@ -2,7 +2,13 @@ import React from "react";
 
 import _ from "lodash";
 
+
+import { Table, Input, Icon } from "semantic-ui-react";
+
+import WaterTestsRow from "./WaterTestsRow";
+
 import { Table, Input } from "semantic-ui-react";
+
 
 class WaterTestsTable extends React.Component {
   state = {
@@ -30,8 +36,13 @@ class WaterTestsTable extends React.Component {
     });
   };
 
+  handleDeleteClick() {
+    console.log("click", this);
+  }
+
   render() {
     const { column, data, direction } = this.state;
+    console.log(">", this.props);
 
     return (
       <div>
@@ -58,21 +69,9 @@ class WaterTestsTable extends React.Component {
           </Table.Header>
 
           <Table.Body>
-            {data.map(testData => (
-              <Table.Row>
-                <Table.Cell>{testData.testDate}</Table.Cell>
-                <Table.Cell>{testData.testNo3}</Table.Cell>
-                <Table.Cell>{testData.testPo4}</Table.Cell>
-                <Table.Cell>{testData.testK}</Table.Cell>
-                <Table.Cell>{testData.testMg}</Table.Cell>
-                <Table.Cell>{testData.testCa}</Table.Cell>
-                <Table.Cell>{testData.testFe}</Table.Cell>
-                <Table.Cell>{testData.testKh}</Table.Cell>
-                <Table.Cell>{testData.testGh}</Table.Cell>
-                <Table.Cell>{testData.ratioNPK}</Table.Cell>
-                <Table.Cell>{testData.ratioCaMgK}</Table.Cell>
-              </Table.Row>
-            ))}
+
+            {data &&
+              data.map(testData => <WaterTestsRow testData={testData} />)}
           </Table.Body>
         </Table>
       </div>
