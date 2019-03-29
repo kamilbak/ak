@@ -17,6 +17,8 @@ import ShowWaterTests from "./ShowWaterTests";
 import PPMCalculator from "./PPMCalculator";
 import LogInPage from "./LogInPage";
 
+import { ToastContainer, toast } from "react-toastify";
+
 import "../styles.css";
 
 class App extends Component {
@@ -41,6 +43,7 @@ class App extends Component {
             <Route exact path="/edit-aquarium-event" component={EditAquarium} />
           </Container>
           <FooterBar />
+          <ToastContainer autoClose={20000} />
         </div>
       </Router>
     );
