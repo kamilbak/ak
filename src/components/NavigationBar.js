@@ -6,6 +6,8 @@ import { withRouter } from "react-router-dom";
 
 import { Nav, NavItem, NavLink, Button } from "reactstrap";
 
+import { Menu } from "semantic-ui-react";
+
 class NavigationBar extends Component {
   handleLogOutButton = e => {
     e.preventDefault();
@@ -37,12 +39,19 @@ class NavigationBar extends Component {
     if (logInStatus) {
       links = (
         <div>
+          <Menu>
+            <Menu.Item as={Link} name="home" to="/">
+              Home
+            </Menu.Item>
+
+            <Menu.Menu position="right">
+              <Menu.Item name="signup" onClick={this.handleLogOutButton}>
+                Sign Up
+              </Menu.Item>
+            </Menu.Menu>
+          </Menu>
+
           <Nav>
-            <NavItem>
-              <NavLink tag={Link} to="/">
-                Home
-              </NavLink>
-            </NavItem>
             <NavItem>
               <NavLink tag={Link} to="/add-aquarium">
                 Add new aquarium
@@ -74,7 +83,6 @@ class NavigationBar extends Component {
                 Add aquarium event
               </NavLink>
             </NavItem>
-            <Button onClick={this.handleLogOutButton}>Log out</Button>
           </Nav>
           <hr />
         </div>
@@ -106,13 +114,13 @@ class NavigationBar extends Component {
 const mapStateToProps = state => {
   // console.log("navbar", state);
   return {
-    logInStatus: state.firebase.auth.uid
+    logInStatus: state.firebase.auth.uid,
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    logOut: () => dispatch(logOut())
+    logOut: () => dispatch(logOut()),
   };
 };
 
