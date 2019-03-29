@@ -1,27 +1,17 @@
 import * as React from "react";
-import { connect } from "react-redux";
-import { addWaterTest } from "../store/actions/waterTests";
 
-import {
-  Col,
-  Row,
-  Button,
-  Form,
-  FormGroup,
-  Label,
-  Input,
-  FormText
-} from "reactstrap";
+import { onlyNumAndDot, calculateSalt } from "../utils";
+
+import { Col, Row, Button, Form, FormGroup, Label, Input } from "reactstrap";
 
 import {
   ButtonDropdown,
   DropdownToggle,
   DropdownMenu,
-  DropdownItem
+  DropdownItem,
 } from "reactstrap";
 
 import "react-datepicker/dist/react-datepicker.css";
-import styled from "styled-components";
 
 class PPMCalcuator extends React.Component {
   constructor(props) {
@@ -29,100 +19,33 @@ class PPMCalcuator extends React.Component {
     this.state = {
       elements: [],
       dropdownOpen: false,
-      aquariumVolumeNet: "260" // 260
     };
     this.elements = ["n", "p", "k", "fe", "mg"];
-    this.salts = [
-      {
-        name: "kno3",
-        elements: [
-          { name: "n", percentIn: "61" },
-          { name: "k", percentIn: "38.7" }
-        ]
-      },
-      {
-        name: "kh2po4",
-        elements: [
-          { name: "p", percentIn: "69.8" },
-          { name: "k", percentIn: "28.7" }
-        ]
-      },
-      {
-        name: "k2so4",
-        elements: [{ name: "k", percentIn: "44.83" }]
-      },
-      {
-        name: "microchelatFe8",
-        elements: [{ name: "fe", percentIn: "8" }]
-      },
-      {
-        name: "mgso47h2o",
-        elements: [{ name: "mg", percentIn: "9.9" }]
-      }
-    ];
   }
 
   handleDropdownToggle = () => {
     this.setState({
-      dropdownOpen: !this.state.dropdownOpen
+      dropdownOpen: !this.state.dropdownOpen,
     });
   };
 
   handleTestChange = event => {
-    let onlyNumDot = event.target.value.replace(/[^0-9.]/g, "");
-    if (onlyNumDot.split(".").length > 2) {
-      onlyNumDot = onlyNumDot.replace(/\.+$/, "");
-    }
     this.setState({
-      [event.target.name]: onlyNumDot
+      [event.target.name]: onlyNumAndDot(event.target.value),
     });
   };
 
-  calculateSaltAmmount = (elementValue, saltNum) => {
-    return (
-      (elementValue * this.state.aquariumVolumeNet) /
-      (this.salts[saltNum].elements[0].percentIn * 10)
-    );
-  };
-
-  calculateExtraElementPpm = (saltAmount, saltNum) => {
-    // !! posible bad calculation for extraElementAmount
-    if (saltNum !== undefined) {
-      return (
-        (this.salts[saltNum].elements[1].percentIn * saltAmount * 10) /
-        this.state.aquariumVolumeNet
-      );
-    }
-  };
-
-  roundedToTwo = number => {
-    return Math.round(number * 100) / 100;
-  };
-
-  showRecipe = (
-    elementValue,
-    elementName,
-    saltAmount,
-    saltNum,
-    extraElementAmount
-  ) => {
+  showRecipe = (elementName, elementAmount, saltName, saltAmount) => {
     console.log(
       "To add",
-      elementValue,
+      elementAmount,
       "PPM of",
       elementName.toUpperCase(),
       "you have to add",
-      this.roundedToTwo(saltAmount),
+      saltAmount,
       "g of",
-      this.salts[saltNum].name.toUpperCase()
+      saltName.toUpperCase()
     );
-    if (extraElementAmount !== undefined) {
-      console.log(
-        "Additionaly you will add",
-        this.roundedToTwo(extraElementAmount),
-        "PPM of K"
-      );
-    }
   };
 
   handleCalculateElementsBtnClick = () => {
@@ -136,60 +59,19 @@ class PPMCalcuator extends React.Component {
         console.warn("nothing to calculate, value is empty");
         return;
       }
-      if (element.name === "n") {
-        const saltNum = 0;
-        const saltAmount = this.calculateSaltAmmount(element.value, saltNum);
 
-        // posible bad calculation for extraElementAmount
-        const extraElementAmount = this.calculateExtraElementPpm(
-          saltAmount,
-          saltNum
-        );
+      const saltData = calculateSalt(
+        element.name,
+        element.value,
+        this.props.aquariumVolumeNet
+      );
 
-        this.showRecipe(
-          element.value,
-          element.name,
-          saltAmount,
-          saltNum,
-          extraElementAmount
-        );
-      }
-      if (element.name === "p") {
-        const saltNum = 1;
-        const saltAmount = this.calculateSaltAmmount(element.value, saltNum);
-
-        // posible bad calculation for extraElementAmount
-        const extraElementAmount = this.calculateExtraElementPpm(
-          saltAmount,
-          saltNum
-        );
-
-        this.showRecipe(
-          element.value,
-          element.name,
-          saltAmount,
-          saltNum,
-          extraElementAmount
-        );
-      }
-      if (element.name === "k") {
-        const saltNum = 2;
-        const saltAmount = this.calculateSaltAmmount(element.value, saltNum);
-
-        this.showRecipe(element.value, element.name, saltAmount, saltNum);
-      }
-      if (element.name === "fe") {
-        const saltNum = 3;
-        const saltAmount = this.calculateSaltAmmount(element.value, saltNum);
-
-        this.showRecipe(element.value, element.name, saltAmount, saltNum);
-      }
-      if (element.name === "mg") {
-        const saltNum = 4;
-        const saltAmount = this.calculateSaltAmmount(element.value, saltNum);
-
-        this.showRecipe(element.value, element.name, saltAmount, saltNum);
-      }
+      this.showRecipe(
+        element.name,
+        element.value,
+        saltData.saltName,
+        saltData.missingSaltAmount
+      );
     });
   };
 
@@ -201,9 +83,9 @@ class PPMCalcuator extends React.Component {
           ...previousState.elements,
           {
             name: element,
-            value: ""
-          }
-        ]
+            value: "",
+          },
+        ],
       };
     });
 
@@ -221,16 +103,15 @@ class PPMCalcuator extends React.Component {
       elements: state.elements.map(item => {
         if (item.name === element) return { ...item, value: value };
         return item;
-      })
+      }),
     }));
   };
 
   render() {
-    // console.warn("state", this.state);
     return (
       <div>
         <p>
-          Your aquarium volume net is <b>{this.state.aquariumVolumeNet}l</b>
+          Your aquarium volume net is <b>{this.props.aquariumVolumeNet}l</b>
         </p>
         <p>What elements we want to add?</p>
         <ButtonDropdown
@@ -285,5 +166,9 @@ class PPMCalcuator extends React.Component {
     );
   }
 }
+
+PPMCalcuator.defaultProps = {
+  aquariumVolumeNet: 260,
+};
 
 export default PPMCalcuator;

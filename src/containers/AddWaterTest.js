@@ -2,6 +2,8 @@ import * as React from "react";
 import { connect } from "react-redux";
 import { addWaterTest } from "../store/actions/waterTests";
 
+import { onlyNumAndDot, calculateSalt } from "../utils";
+
 import {
   Col,
   Row,
@@ -10,8 +12,10 @@ import {
   FormGroup,
   Label,
   Input,
-  FormText
+  FormText,
 } from "reactstrap";
+
+import "react-toastify/dist/ReactToastify.css";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -42,7 +46,7 @@ class AddWaterTest extends React.Component {
       testKh: "",
       testGh: "",
       ratioNPK: "",
-      ratioCaMgK: ""
+      ratioCaMgK: "",
     };
   }
 
@@ -50,18 +54,16 @@ class AddWaterTest extends React.Component {
 
   handleDatePickerChange = testDate => {
     this.setState({
-      testDate
+      testDate,
     });
   };
 
   handleTestChange = event => {
-    let onlyNumDot = event.target.value.replace(/[^0-9.]/g, "");
-    if (onlyNumDot.split(".").length > 2) {
-      onlyNumDot = onlyNumDot.replace(/\.+$/, "");
-    }
+    let onlyNumDot = onlyNumAndDot(event.target.value);
+
     this.setState(
       {
-        [event.target.name]: onlyNumDot
+        [event.target.name]: onlyNumDot,
       },
       () => {
         this.calculateNPKRatios();
@@ -70,15 +72,59 @@ class AddWaterTest extends React.Component {
     );
   };
 
-  handleBtnClick = () => {
+  handleAddTest = () => {
     this.calculateNPKRatios();
     this.calculateCaMgKRatios();
     // temporary, for firebase timestamp
     let stateToDispatch = {
       ...this.state,
-      testDate: this.state.testDate.toLocaleDateString("en-GB")
+      testDate: this.state.testDate.toLocaleDateString("en-GB"),
     };
     this.props.dispatch(addWaterTest(stateToDispatch));
+  };
+
+  handleAddTestAndCalculate = () => {
+    this.handleAddTest();
+
+    if (this.props.optimalWaterTest.testNo3 !== this.state.testNo3) {
+      let missingPPM = this.props.optimalWaterTest.testNo3 - this.state.testNo3;
+      const saltData = calculateSalt(
+        "n",
+        missingPPM,
+        this.props.aquariumVolumeNet
+      );
+      console.log(
+        `Missing ${missingPPM}ppm of No3. To fix it add ${
+          saltData.missingSaltAmount
+        } of ${saltData.saltName} `
+      );
+    }
+    if (this.props.optimalWaterTest.testPo4 !== this.state.testPo4) {
+      let missingPPM = this.props.optimalWaterTest.testPo4 - this.state.testPo4;
+      const saltData = calculateSalt(
+        "p",
+        missingPPM,
+        this.props.aquariumVolumeNet
+      );
+      console.log(
+        `Missing ${missingPPM}ppm of Po4. To fix it add ${
+          saltData.missingSaltAmount
+        } of ${saltData.saltName} `
+      );
+    }
+    if (this.props.optimalWaterTest.testK !== this.state.testK) {
+      let missingPPM = this.props.optimalWaterTest.testK - this.state.testK;
+      const saltData = calculateSalt(
+        "k",
+        missingPPM,
+        this.props.aquariumVolumeNet
+      );
+      console.log(
+        `Missing ${missingPPM}ppm of K. To fix it add ${
+          saltData.missingSaltAmount
+        } of ${saltData.saltName} `
+      );
+    }
   };
 
   calculateNPKRatios = () => {
@@ -95,7 +141,7 @@ class AddWaterTest extends React.Component {
       ${roundedToOne(divisor * k)}`;
 
       this.setState({
-        ratioNPK
+        ratioNPK,
       });
     }
   };
@@ -114,12 +160,12 @@ class AddWaterTest extends React.Component {
       ${roundedToOne(divisor * k)}`;
 
       this.setState({
-        ratioCaMgK
+        ratioCaMgK,
       });
     }
   };
 
-  clearStateAfterClick = () => {
+  clearState = () => {
     this.setState({
       testDate: new Date(),
       testNo3: "",
@@ -131,7 +177,7 @@ class AddWaterTest extends React.Component {
       testKh: "",
       testGh: "",
       ratioNPK: "",
-      ratioCaMgK: ""
+      ratioCaMgK: "",
     });
   };
 
@@ -273,11 +319,25 @@ class AddWaterTest extends React.Component {
             </Col>
           </Row>
 
-          <Button onClick={this.handleBtnClick}>Add Test</Button>
+          <Button onClick={this.handleAddTest}>Add test</Button>
+          <Button onClick={this.handleAddTestAndCalculate}>
+            Add test and calculate
+          </Button>
+          <Button onClick={this.clearState}>Clear</Button>
         </Form>
       </div>
     );
   }
 }
+
+AddWaterTest.defaultProps = {
+  optimalWaterTest: {
+    testNo3: "10",
+    testPo4: "1",
+    testK: "25",
+    testFe: "0.2",
+  },
+  aquariumVolumeNet: 260,
+};
 
 export default connect()(AddWaterTest);
