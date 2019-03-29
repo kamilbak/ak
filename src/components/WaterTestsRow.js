@@ -1,9 +1,10 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 
+import { Table, Icon } from "semantic-ui-react";
+
 import { deleteWaterTest } from "../store/actions/waterTests";
 
-import { Table, Icon } from "semantic-ui-react";
 
 class WaterTestsRow extends Component {
   handleDeleteClick = event => {
@@ -12,7 +13,7 @@ class WaterTestsRow extends Component {
   };
 
   render() {
-    let {
+    const {
       testDate,
       testNo3,
       testPo4,

@@ -1,4 +1,6 @@
 import * as React from "react";
+import { connect } from "react-redux";
+import { addWaterTest } from "../store/actions/waterTests";
 
 import {
   Col,
@@ -94,4 +96,4 @@ class AddEditAquariumEvent extends React.Component {
   }
 }
 
-export default AddEditAquariumEvent;
+export default connect()(AddEditAquariumEvent);

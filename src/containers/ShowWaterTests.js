@@ -1,15 +1,14 @@
-import React, { Component } from "react";
-import { compose } from "redux";
-import { connect } from "react-redux";
-import { firestoreConnect } from "react-redux-firebase";
+import React, { Component } from 'react';
+import { compose } from 'redux';
+import { connect } from 'react-redux';
+import { firestoreConnect } from 'react-redux-firebase';
 
-import WaterTestsTable from "../components/WaterTestsTable";
-import AreaChartExtended from "../components/AreaChartExtended";
+import WaterTestsTable from '../components/WaterTestsTable';
+import AreaChartExtended from '../components/AreaChartExtended';
 
-import { mockedTestsData } from "../utils/dataMocks";
+import { mockedTestsData } from '../utils/dataMocks';
 
-
-import { deleteWaterTest } from "../store/actions/waterTests";
+import { deleteWaterTest } from '../store/actions/waterTests';
 
 import {
   Container,
@@ -19,34 +18,40 @@ import {
   Segment,
   Icon,
   Table,
-} from "semantic-ui-react";
+} from 'semantic-ui-react';
 
 class ShowWaterTests extends Component {
   render() {
-    let sortedDataOldNew = [];
-    let sortedDataNewOld = [];
-    if (this.props.testsData) {
-      sortedDataOldNew = this.props.testsData.sort(function(b, a) {
-        a = a.testDate.split("/");
-        b = b.testDate.split("/");
-        return a[2] - b[2] || a[1] - b[1] || a[0] - b[0];
-      });
-      sortedDataNewOld = this.props.testsData.sort(function(a, b) {
-        a = a.testDate.split("/");
-        b = b.testDate.split("/");
-        return a[2] - b[2] || a[1] - b[1] || a[0] - b[0];
-      });
+
+    let data;
+    if(this.props.testsData) {
+      console.log('-----', this.props.testsData);
     }
+
+    // let sortedDataOldNew = [];
+    // let sortedDataNewOld = [];
+    // if (this.props.testsData) {
+    //   sortedDataOldNew = this.props.testsData.sort(function(b, a) {
+    //     a = a.testDate.split('/');
+    //     b = b.testDate.split('/');
+    //     return a[2] - b[2] || a[1] - b[1] || a[0] - b[0];
+    //   });
+    //   sortedDataNewOld = this.props.testsData.sort(function(a, b) {
+    //     a = a.testDate.split('/');
+    //     b = b.testDate.split('/');
+    //     return a[2] - b[2] || a[1] - b[1] || a[0] - b[0];
+    //   });
+    // }
 
     // console.log(this.props.testsData);
     // this.props.dispatch(deleteWaterTest(this.props.testsData[0].id));
 
-    console.log(this.props.testsData);
-
-
     return (
       <div>
-        <WaterTestsTable testsData={sortedDataNewOld} />
+        {this.props.testsData &&
+          <WaterTestsTable testsData={this.props.testsData} />
+
+        }
         <Header as="h5">
           <Icon.Group size="large">
             <Icon color="green" name="plus circle" />
@@ -98,5 +103,5 @@ const mapStateToProps = state => {
 
 export default compose(
   connect(mapStateToProps),
-  firestoreConnect([{ collection: "tests" }])
+  firestoreConnect([{ collection: 'tests' }])
 )(ShowWaterTests);

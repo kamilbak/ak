@@ -33,7 +33,6 @@ export const deleteWaterTest = testId => {
   return (dispatch, setState, { getFirebase, getFirestore }) => {
     const firestore = getFirestore();
     firestore
-      .collection("tests")
       .delete({ collection: "tests", doc: testId })
       .then(() => {
         // dispatch({

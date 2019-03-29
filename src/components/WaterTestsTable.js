@@ -1,21 +1,20 @@
-import React from "react";
+import React from 'react';
 
-import _ from "lodash";
+import _ from 'lodash';
 
+import { Table, Input, Icon } from 'semantic-ui-react';
 
-import { Table, Input, Icon } from "semantic-ui-react";
-
-import WaterTestsRow from "./WaterTestsRow";
-
-import { Table, Input } from "semantic-ui-react";
-
+import WaterTestsRow from './WaterTestsRow';
 
 class WaterTestsTable extends React.Component {
-  state = {
-    column: null,
-    data: this.props.testsData,
-    direction: null,
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      column: null,
+      data: this.props.testsData,
+      direction: null,
+    };
+  }
 
   handleSort = clickedColumn => () => {
     const { column, data, direction } = this.state;
@@ -24,25 +23,26 @@ class WaterTestsTable extends React.Component {
       this.setState({
         column: clickedColumn,
         data: _.sortBy(data, [clickedColumn]),
-        direction: "ascending",
+        direction: 'ascending',
       });
 
       return;
     }
 
+    this.props.testsData.reverse();
     this.setState({
-      data: data.reverse(),
-      direction: direction === "ascending" ? "descending" : "ascending",
+      // data: data.reverse(),
+      direction: direction === 'ascending' ? 'descending' : 'ascending',
     });
   };
 
   handleDeleteClick() {
-    console.log("click", this);
+    console.log('click', this);
   }
 
   render() {
     const { column, data, direction } = this.state;
-    console.log(">", this.props);
+    console.log('>', this.props);
 
     return (
       <div>
@@ -50,8 +50,8 @@ class WaterTestsTable extends React.Component {
           <Table.Header>
             <Table.Row>
               <Table.HeaderCell
-                sorted={column === "date" ? direction : null}
-                onClick={this.handleSort("date")}
+                sorted={column === 'date' ? direction : null}
+                onClick={this.handleSort('date')}
               >
                 Date
               </Table.HeaderCell>
@@ -69,9 +69,10 @@ class WaterTestsTable extends React.Component {
           </Table.Header>
 
           <Table.Body>
-
-            {data &&
-              data.map(testData => <WaterTestsRow testData={testData} />)}
+            {this.props.testsData &&
+              this.props.testsData.map(testData => (
+                <WaterTestsRow key={testData.id} testData={testData} />
+              ))}
           </Table.Body>
         </Table>
       </div>

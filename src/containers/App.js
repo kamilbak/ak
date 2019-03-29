@@ -11,6 +11,8 @@ import AddAquariumEvent from "../containers/aquariumEvent/AddAquariumEvent";
 
 import { Container } from "reactstrap";
 
+import 'semantic-ui-css/semantic.min.css';
+
 import Home from "./Home";
 import AddWaterTest from "./AddWaterTest";
 import ShowWaterTests from "./ShowWaterTests";
